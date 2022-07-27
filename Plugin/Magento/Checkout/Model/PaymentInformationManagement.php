@@ -33,22 +33,26 @@ class PaymentInformationManagement
      * @param \Magento\Checkout\Model\PaymentInformationManagement $subject
      * @param $cartId
      * @param PaymentInterface $paymentMethod
-     * @param AddressInterface $address
+     * @param AddressInterface|null $address
+     * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function beforeSavePaymentInformation(
         \Magento\Checkout\Model\PaymentInformationManagement $subject,
         $cartId,
         PaymentInterface $paymentMethod,
-        AddressInterface $address
+        ?AddressInterface $address
     ) {
-        $extAttributes = $address->getExtensionAttributes();
-        if (!empty($extAttributes)) {
-            $this->helper->transportFieldsFromExtensionAttributesToObject(
-                $extAttributes,
-                $address,
-                'extra_checkout_billing_address_fields'
-            );
+        if (!is_null($address)) {
+            $extAttributes = $address->getExtensionAttributes();
+            if (!empty($extAttributes)) {
+                $this->helper->transportFieldsFromExtensionAttributesToObject(
+                    $extAttributes,
+                    $address,
+                    'extra_checkout_billing_address_fields'
+                );
+            }
         }
+        return [$cartId, $paymentMethod, $address];
     }
 }
